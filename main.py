@@ -1,83 +1,40 @@
+import sys
+
+from stats import (
+    get_word_count,
+    get_chars_dict,
+    chars_dict_to_sorted_list,
+)
+
 def main():
-    text = get_text("books/frankenstein.txt")
-    print(text)
-
-    word_count = get_word_count(text)
-    print(f"{word_count} words found in the document")
-    print("")
-
-    char_count = get_char_count(text)
-    letter_list = get_letter_list(char_count)
-    for line in letter_list:
-        print(f"The '{line['letter']}' character was found {line['count']} times")
+    if len(sys.argv) < 2:
+        print("Usage: python3 main.py <path_to_book>")
+        sys.exit(1)
+    book_path = sys.argv[1]
+    text = get_book_text(book_path)
+    num_words = get_word_count(text)
+    chars_dict = get_chars_dict(text)
+    chars_sorted_list = chars_dict_to_sorted_list(chars_dict)
+    print_report(book_path, num_words, chars_sorted_list)
 
 
-def get_text(path):
+def get_book_text(path):
     with open(path) as f:
         return f.read()
 
 
-def get_word_count(text):
-    words = text.split()
-    return len(words)
-
-
-def get_char_count(text):
-    lowered_text = text.lower()
-    chars = list(lowered_text)
-    char_dict = {}
-    for char in chars:
-        if char in char_dict:
-            char_dict[char] += 1
-        else:
-            char_dict[char] = 1
-    return char_dict
-
-
-def sort_on(dict):
-    return dict["count"]
-
-
-def get_letter_list(char_dict):
-    alphabet = [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f",
-        "g",
-        "h",
-        "i",
-        "j",
-        "k",
-        "l",
-        "m",
-        "n",
-        "o",
-        "p",
-        "q",
-        "r",
-        "s",
-        "t",
-        "u",
-        "v",
-        "w",
-        "x",
-        "y",
-        "z",
-    ]
-    letter_list = []
-    for char in char_dict:
-        line_dict = {}
-        for letter in alphabet:
-            if char == letter:
-                line_dict["letter"] = letter
-                line_dict["count"] = char_dict[char]
-                letter_list.append(line_dict)
-
-    letter_list.sort(reverse=True, key=sort_on)
-    return letter_list
-
+def print_report(book_path, num_words, chars_sorted_list):
+    print("============ BOOKBOT ============")
+    print(f"Analyzing book found at {book_path}...")
+    print("----------- Word Count ----------")
+    print(f"Found {num_words} total words")
+    print("--------- Character Count -------")
+    for item in chars_sorted_list:
+        if not item["char"].isalpha():
+            continue
+        print(f"{item['char']}: {item['num']}")
+    
+    print("============= END ===============")
+    
 
 main()
